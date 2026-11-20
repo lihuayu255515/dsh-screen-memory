@@ -23,18 +23,18 @@
 1. 打开 DeepSeek Harness
 2. 进 **设置 → 插件**（或点侧边栏的「插件」）
 3. 找到 **安装插件 / 从本地安装**
-4. 选中你下载的 `dsh-screen-memory-0.4.18.tgz`
+4. 选中你下载的最新版 `dsh-screen-memory-0.5.5.tgz`（以实际下载的文件名为准）
 5. **完全退出 App 再打开**（不是关窗口，要退出进程）
 
 > 如果 App 里找不到「从本地安装」，就把下面这句话发给 App 里的 AI：
-> 「我下载了一个 DSH 插件 dsh-screen-memory-0.4.18.tgz，在下载文件夹。请告诉我这个桌面版应该怎么装它，一步一步来，我看不懂技术名词。」
+> 「我下载了一个 DSH 插件 dsh-screen-memory-0.5.5.tgz，在下载文件夹。请告诉我这个桌面版应该怎么装它，一步一步来，我看不懂技术名词。」
 
 ### B. 命令行 / 网页版
 
 把 tgz 放到一个好找的地方（例如 `C:\Users\你\Downloads`），然后：
 
 ```powershell
-dsh plugin --profile web add "C:\Users\你\Downloads\dsh-screen-memory-0.4.18.tgz"
+dsh plugin --profile web add "C:\Users\你\Downloads\dsh-screen-memory-0.5.5.tgz"
 # 装完重启 DSH（关掉再开）
 ```
 
@@ -110,7 +110,7 @@ node scripts\verify.mjs     # 应该是 0 个 FAIL，最后显示「✅ 验收�
 | 装完没有任何 `screen_*` 工具 | 没重启，或装到了另一个 profile；重启后让 AI 再调 `screen_status` |
 | 命令报 `profile "desktop" is managed exclusively...` | 你用的是桌面版：按第二节 A 用 App 内插件管理装 |
 | 截图是黑的 / 只有桌面 | 目标游戏是全屏独占，改成「无边框窗口」 |
-| 截图只有左上角一块 | 你的插件版本 < 0.4.18；换最新版 |
+| 截图只有左上角一块 | 插件版本过旧（< 0.4.18）；换最新版 |
 | 「特写未生成：…」 | 没装 ffmpeg（见第五节），不是坏了 |
 | 眼睛报「没有配置视觉 API」 | 没配 Key（见第五节） |
 | 想彻底卸载 | 桌面版：App 里卸载插件；命令行：`dsh plugin --profile <名字> remove dsh-screen-memory` |
@@ -120,7 +120,7 @@ node scripts\verify.mjs     # 应该是 0 个 FAIL，最后显示「✅ 验收�
 ## 八、给 AI 的「一句话安装指令」（复制即用）
 
 ```text
-我下载了一个 DSH 插件：dsh-screen-memory-0.4.18.tgz，在下载文件夹。
+我下载了一个 DSH 插件：dsh-screen-memory-0.5.5.tgz，在下载文件夹。
 我不懂技术，请你按最稳的方式帮我装好，并且：
 · 装之前先跑包里的 scripts/doctor.mjs，告诉我环境缺不缺东西；
 · 告诉我应该用桌面版 App 装还是命令行装（别装错）；
