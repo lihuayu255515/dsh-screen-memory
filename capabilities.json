@@ -1,6 +1,6 @@
 {
   "name": "dsh-screen-memory",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "stage": "P1.5 + P2 + P3 + P4",
   "platforms": {
     "win32": {
@@ -219,7 +219,7 @@
       "note": "screen_look 只产生图片文件；要分析必须走 read_image 或 screen_describe"
     },
     "warehouseUI": {
-      "stage": "M2.1",
+      "stage": "M2.2",
       "path": "/dsh-screen-memory/ui",
       "panel": "sidebar.right.pane.tab（退化：settings.section）",
       "readOnly": false,
@@ -270,7 +270,8 @@
         "回顾/整理查询全量候选，不只看最新一批",
         "最小化窗口判失败，不返回 1x1 假成功",
         "HUD place 统一为 corner/br/bl/tr/tl/rail/strip",
-        "WebP 支持 VP8X/VP8/VP8L"
+        "WebP 支持 VP8X/VP8/VP8L",
+        "定时归档失败不写 lastAt，下一次 5 分钟检查重试"
       ]
     },
     "maintainSchedule": {
