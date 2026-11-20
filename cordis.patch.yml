@@ -1,0 +1,8 @@
+# 屏幕记忆（dsh-screen-memory）
+#
+# 纯增量：只在 profile 里插入一行宿主插件，不改任何核心包。
+# 想手动移除：删掉本行 + 从 profile package.json 的 dependencies / dsh.profile.bundles 里删掉 dsh-screen-memory。
+- insert:
+    - id: screen-memory
+      name: dsh-screen-memory
+      config: {}

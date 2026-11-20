@@ -1,0 +1,66 @@
+{
+  "name": "dsh-screen-memory",
+  "version": "0.4.23",
+  "description": "DSH 屏幕记忆：截图（整屏/窗口/特写）+ 本地图片仓库（内容寻址 + SQLite）+ 分层归档 + 回顾判断 + 眼睛（视觉 API 看图转文字）+ 上下文预算三档。README 含 AI agent 安装与告知指南。",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/",
+    "scripts/",
+    "cordis.patch.yml",
+    "README.md",
+    "TESTING.md",
+    "AGENT_INSTALL.md",
+    "rollback.ps1",
+    "capabilities.json",
+    "TEST_PROMPT.md",
+    "api-snapshot.json",
+    "NEWBIE_QUICKSTART.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek",
+    "harness",
+    "screen-capture",
+    "screenshot",
+    "image-store",
+    "gallery",
+    "memory"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tools": "*"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/dsh-tools": {
+      "optional": true
+    }
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "slots"
+      ],
+      "external": [
+        "react"
+      ]
+    }
+  },
+  "scripts": {
+    "release": "node scripts/release-check.mjs"
+  }
+}

@@ -1,0 +1,328 @@
+{
+  "name": "dsh-screen-memory",
+  "version": "0.4.23",
+  "stage": "P1.5 + P2 + P3 + P4",
+  "platforms": {
+    "win32": {
+      "capture": [
+        "ffmpeg",
+        "powershell"
+      ],
+      "full": true,
+      "windowCapture": "powershell",
+      "hudCompose": "ffmpeg"
+    },
+    "darwin": {
+      "capture": [],
+      "full": false,
+      "todo": "ffmpeg avfoundation（未实现）"
+    },
+    "linux": {
+      "capture": [],
+      "full": false,
+      "todo": "ffmpeg x11grab（未实现）"
+    }
+  },
+  "dependencies": {
+    "node": {
+      "min": "18",
+      "recommended": ">=22",
+      "reason": ">=22 才有 node:sqlite；低版本退化 JSON 索引"
+    },
+    "ffmpeg": {
+      "required": false,
+      "enables": [
+        "window capture",
+        "hud compose",
+        "faster full-screen capture"
+      ],
+      "detect": [
+        "FFMPEG_PATH",
+        "DSH_FFMPEG_PATH",
+        "PATH",
+        "winget links"
+      ],
+      "missingBehavior": "回退 PowerShell 整屏截图；按窗口与特写返回明确错误"
+    },
+    "vision": {
+      "required": false,
+      "enables": [
+        "screen_describe"
+      ],
+      "configSources": [
+        "插件配置 vision.apiKey",
+        "DSH_VISION_API_KEY",
+        "~/.dsh/.credentials.yaml 的 DEEPSEEK_API_KEY"
+      ],
+      "missingBehavior": "screen_describe 返回配置指引，其余工具正常"
+    },
+    "host": {
+      "package": "@deepseek-ai/dsh-tools",
+      "required": false,
+      "missingBehavior": "使用内置等价 defineTool，工具照常注册"
+    }
+  },
+  "tools": [
+    {
+      "name": "screen_status",
+      "requires": [],
+      "alwaysAvailable": true
+    },
+    {
+      "name": "screen_look",
+      "requires": [
+        "capture"
+      ],
+      "missingBehavior": "返回错误说明"
+    },
+    {
+      "name": "screen_archive",
+      "requires": [],
+      "alwaysAvailable": true
+    },
+    {
+      "name": "screen_describe",
+      "requires": [
+        "vision"
+      ],
+      "missingBehavior": "返回配置指引"
+    },
+    {
+      "name": "screen_list",
+      "requires": [],
+      "alwaysAvailable": true
+    },
+    {
+      "name": "screen_get",
+      "requires": [],
+      "alwaysAvailable": true
+    },
+    {
+      "name": "screen_hud",
+      "requires": [],
+      "alwaysAvailable": true
+    },
+    {
+      "name": "screen_review",
+      "requires": [],
+      "missingBehavior": "alwaysAvailable=True"
+    },
+    {
+      "name": "screen_judge",
+      "requires": [],
+      "missingBehavior": "alwaysAvailable=True"
+    },
+    {
+      "name": "screen_maintain",
+      "requires": [
+        "tar"
+      ],
+      "missingBehavior": "系统自带 tar；缺失时归档返回错误"
+    },
+    {
+      "name": "screen_search",
+      "requires": [],
+      "missingBehavior": "alwaysAvailable=True"
+    }
+  ],
+  "features": {
+    "capture": {
+      "backends": [
+        "ffmpeg",
+        "powershell"
+      ],
+      "fullScreen": true,
+      "window": "powershell (GetWindowRect); \"auto\" = foreground window",
+      "format": [
+        "jpg",
+        "png"
+      ],
+      "quality": "1-100",
+      "windowCaptureNeedsFfmpeg": false,
+      "dpiAware": true,
+      "fullScreenFixes": [
+        "0.4.18 起 PowerShell 先 SetProcessDpiAwareness，150% 缩放下也能截满整屏"
+      ]
+    },
+    "hud": {
+      "requires": "ffmpeg",
+      "places": [
+        "corner",
+        "br",
+        "bl",
+        "tr",
+        "tl",
+        "rail",
+        "strip"
+      ],
+      "profilesPerWindow": true,
+      "profilesFile": "hud-profiles.json"
+    },
+    "vision": {
+      "provider": "OpenAI 兼容 /chat/completions",
+      "models": [
+        "deepseek-flash（默认）",
+        "qwen-vl",
+        "gpt-4o",
+        "glm-4v",
+        "任意本地 vLLM"
+      ],
+      "output": "三段式文字（界面 / 可点项与数字 / 看不清）",
+      "dailyCap": 100,
+      "usageFile": "vision-usage.json",
+      "maxEdgeDefault": 1400,
+      "resolutionNote": "实测 900 会因小字糊而让模型猜测（更贵更不准）；1400 最准也最省"
+    },
+    "store": {
+      "contentAddressed": true,
+      "index": [
+        "node:sqlite",
+        "json fallback"
+      ],
+      "mime": true
+    },
+    "budget": {
+      "profiles": {
+        "rich": {
+          "imagesPerHour": 20,
+          "givePath": true
+        },
+        "balanced": {
+          "imagesPerHour": 6,
+          "givePath": true
+        },
+        "lean": {
+          "imagesPerHour": 0,
+          "givePath": false
+        }
+      },
+      "configKey": "budget.profile",
+      "rationale": "主会话每张图约占 1000 token 且长期留在上下文；用每小时配额 + 是否给路径控制爆上下文风险"
+    },
+    "retention": {
+      "states": [
+        "hot",
+        "archived",
+        "trashed"
+      ],
+      "archiveFormat": "tar.gz（系统 tar）",
+      "defaultArchiveAfterDays": 30,
+      "defaultTrashDays": 7,
+      "restore": "screen_get 时自动从归档解出"
+    },
+    "viewing": {
+      "routes": [
+        "read_image (your own model)",
+        "screen_describe (plugin vision API)",
+        "screenshot only (no analysis)"
+      ],
+      "note": "screen_look 只产生图片文件；要分析必须走 read_image 或 screen_describe"
+    },
+    "warehouseUI": {
+      "stage": "M1",
+      "path": "/dsh-screen-memory/ui",
+      "panel": "sidebar.right.pane.tab（退化：settings.section）",
+      "readOnly": true,
+      "shows": "screen 截图（source LIKE screen%）",
+      "actions": [
+        "浏览缩略图",
+        "查看原图",
+        "让 AI 看这张（调用视觉 API，计入日限）"
+      ],
+      "disclosure": "页面内「这是什么？」说明 + 眼睛未配置时按钮置灰并提示"
+    },
+    "maintainSchedule": {
+      "enabled": true,
+      "hour": 22,
+      "intervalDays": 3,
+      "batch": 10,
+      "archiveAfterDays": 30,
+      "trashAfterDays": 7,
+      "note": "只归档不自动清回收站"
+    }
+  },
+  "dataDir": "~/.dsh/storages/screen-memory",
+  "privacy": {
+    "uploadsImages": false,
+    "visionApiUpload": "仅当调用 screen_describe 时把图片发给配置的视觉 API",
+    "capturesScreen": true
+  },
+  "safety": {
+    "applyTryCatch": true,
+    "registersGlobalHooks": false,
+    "opensPorts": false,
+    "createsScheduledTasks": false,
+    "uninstallKeepsData": true,
+    "rollbackScript": "rollback.ps1"
+  },
+  "readme": {
+    "agentSection": true,
+    "tellsUser": [
+      "capturesScreen",
+      "visionAPIImages",
+      "archiveDeletesOriginal"
+    ]
+  },
+  "testing": {
+    "doctor": "scripts/doctor.mjs",
+    "verify": "scripts/verify.mjs",
+    "releaseGate": [
+      "verify no FAIL",
+      "doctor ok",
+      "install-uninstall cycle",
+      "rollback drill",
+      "version consistency"
+    ],
+    "testPrompt": "TEST_PROMPT.md",
+    "releaseCheck": "scripts/release-check.mjs（npm run release）",
+    "info": "scripts/info.mjs（node scripts/info.mjs [--json]）"
+  },
+  "limitations": {
+    "exclusiveFullscreen": "无法截图（GDI 限制）；改用无边框窗口",
+    "occludedWindow": "按窗口截图会拍到遮挡物（屏幕矩形拷贝）",
+    "minimizedWindow": "无法截取",
+    "multiMonitor": "整屏为虚拟桌面合并；region 以截图像素为原点",
+    "highDpi": "截图尺寸可能与逻辑分辨率不同，以返回宽高为准",
+    "nonWindowsCapture": "未实现",
+    "noFfmpeg": "无法特写；整屏/窗口仍可用",
+    "noTar": "无法归档/清理回收站",
+    "noVisionKey": "screen_describe 不可用",
+    "imagesInContext": "主会话每图约 1000 token 且长期保留",
+    "noEncryption": "仓库为本地明文"
+  },
+  "missingEnvironmentOptions": {
+    "ffmpeg": [
+      "winget install Gyan.FFmpeg",
+      "choco install ffmpeg",
+      "scoop install ffmpeg",
+      "manual + FFMPEG_PATH"
+    ],
+    "visionAPI": [
+      "DEEPSEEK_API_KEY in ~/.dsh/.credentials.yaml",
+      "vision {apiKey,baseUrl,model}",
+      "local Ollama OpenAI-compatible"
+    ],
+    "imageViewingPlugin": [
+      "screen_describe (built-in)",
+      "dsh-plugin-image-input",
+      "dsh-tool-describe-image",
+      "dsh-vision-router",
+      "do nothing"
+    ],
+    "tar": [
+      "Windows 10+ builtin",
+      "install 7-Zip (manual)",
+      "skip archiving"
+    ],
+    "node": [
+      "use DSH bundled node; check screen_status.node"
+    ]
+  },
+  "knownIssues": [
+    "0.4.4 及以前：region schema 缺 properties/additionalProperties（0.4.5 修）",
+    "0.4.5 及以前：render 无 text 时返回空（0.4.6 修）",
+    "0.4.6 及以前：describe 读归档图失败 / 大图未压缩 / 特写失败无提示（0.4.7 修）",
+    "0.4.9 及以前：内置兜底 defineTool 忽略了传入的 render，导致 verify 在找不到宿主 dsh-tools 的进程里 render 为空（0.4.10 修）",
+    "0.4.10 及以前：rollback.ps1 缺 UTF-8 BOM，Windows PowerShell 下会乱码报错（0.4.11 修）"
+  ]
+}

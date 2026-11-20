@@ -1,0 +1,11 @@
+# Release-check temp artifacts
+.tmp-release-check/
+
+# Node
+node_modules/
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+
+# Local test output
+*.log

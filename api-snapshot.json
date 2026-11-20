@@ -1,0 +1,289 @@
+{
+  "version": "0.4.23",
+  "tools": {
+    "screen_status": {
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      },
+      "output": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "screen_look": {
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "window": {
+            "type": "string",
+            "description": "窗口标题（完整标题；需要 ffmpeg）。省略=整屏"
+          },
+          "region": {
+            "type": "object",
+            "description": "特写区域 {x,y,w,h}（相对截图左上角像素）",
+            "additionalProperties": false,
+            "properties": {
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              },
+              "w": {
+                "type": "number"
+              },
+              "h": {
+                "type": "number"
+              }
+            }
+          },
+          "place": {
+            "type": "string",
+            "description": "特写摆放：corner（默认右下）/ br bl tr tl / rail（右侧）/ strip（下方）"
+          },
+          "format": {
+            "type": "string",
+            "description": "jpg（默认）或 png"
+          },
+          "quality": {
+            "type": "number",
+            "description": "JPEG 质量 1~100，默认 85"
+          },
+          "note": {
+            "type": "string",
+            "description": "可选备注，方便以后检索"
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "screen_archive": {
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "本地图片绝对路径"
+          },
+          "dataUrl": {
+            "type": "string",
+            "description": "data:image/...;base64,... 形式的图片"
+          },
+          "note": {
+            "type": "string",
+            "description": "备注（写一句图里是什么，方便以后找）"
+          },
+          "source": {
+            "type": "string",
+            "description": "来源标记，如 qq / web / 截图"
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "screen_list": {
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "关键词（匹配备注/来源）"
+          },
+          "limit": {
+            "type": "number",
+            "description": "最多几条，默认 20"
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "screen_get": {
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "图片编号"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "output": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "screen_hud": {
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "window": {
+            "type": "string",
+            "description": "窗口标题"
+          },
+          "region": {
+            "type": "object",
+            "description": "特写区域 {x,y,w,h}",
+            "additionalProperties": false,
+            "properties": {
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              },
+              "w": {
+                "type": "number"
+              },
+              "h": {
+                "type": "number"
+              }
+            }
+          },
+          "place": {
+            "type": "string",
+            "description": "摆放：corner/br/bl/tr/tl/rail/strip"
+          },
+          "clear": {
+            "type": "boolean",
+            "description": "true=清除该窗口的档案"
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "screen_describe": {
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "仓库里的图片编号；省略则用最新一张"
+          },
+          "path": {
+            "type": "string",
+            "description": "本地图片路径（与 id 二选一）"
+          },
+          "question": {
+            "type": "string",
+            "description": "可选：你特别想知道什么（会作为关注点）"
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "screen_review": {
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "number",
+            "description": "最多列几张，默认 10"
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "screen_judge": {
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "图片编号"
+          },
+          "keep": {
+            "type": "boolean",
+            "description": "true=保留，false=丢回收站"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "output": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "screen_maintain": {
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "dryRun": {
+            "type": "boolean",
+            "description": "true=只报告不执行"
+          },
+          "archiveAfterDays": {
+            "type": "number",
+            "description": "hot 超过多少天归档，默认 30"
+          },
+          "trashAfterDays": {
+            "type": "number",
+            "description": "回收站超过多少天删除，默认 7"
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "screen_search": {
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "关键词"
+          },
+          "days": {
+            "type": "number",
+            "description": "最近多少天"
+          },
+          "since": {
+            "type": "number",
+            "description": "起始时间戳（毫秒，可选）"
+          },
+          "until": {
+            "type": "number",
+            "description": "结束时间戳（毫秒，可选）"
+          },
+          "limit": {
+            "type": "number",
+            "description": "最多几条，默认 20"
+          },
+          "state": {
+            "type": "string",
+            "description": "只看某个状态：hot / archived / trashed"
+          }
+        }
+      },
+      "output": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    }
+  }
+}
