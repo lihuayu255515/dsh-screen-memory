@@ -29,6 +29,7 @@ public class DpiHelper {
     [DllImport("shcore.dll")] public static extern int SetProcessDpiAwareness(int value);
     [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
     [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr hWnd, out Win32Rect rect);
+    [DllImport("user32.dll")] public static extern bool IsIconic(IntPtr hWnd);
 }
 '@
 }
@@ -60,6 +61,10 @@ if ($WindowTitle -eq 'auto') {
         Write-Error '拿不到当前前台窗口（可能切到了本进程）'
         exit 3
     }
+    if ([DpiHelper]::IsIconic($win.MainWindowHandle)) {
+        Write-Error '当前前台窗口已最小化，无法截取窗口'
+        exit 5
+    }
     $rect = New-Object Win32Rect
     if (-not [DpiHelper]::GetWindowRect($win.MainWindowHandle, [ref]$rect)) {
         Write-Error '拿不到前台窗口位置'
@@ -90,6 +95,10 @@ elseif ($WindowTitle) {
         Write-Error "找不到标题包含「$WindowTitle」的窗口"
         exit 3
     }
+    if ([DpiHelper]::IsIconic($win.MainWindowHandle)) {
+        Write-Error "窗口「$($win.MainWindowTitle)」已最小化，无法截取"
+        exit 5
+    }
     $rect = New-Object Win32Rect
     if (-not [DpiHelper]::GetWindowRect($win.MainWindowHandle, [ref]$rect)) {
         Write-Error '拿不到窗口位置'
@@ -109,6 +118,11 @@ elseif ($WindowTitle) {
     $srcLeft = $x1; $srcTop = $y1
     $srcWidth = [Math]::Max(1, $x2 - $x1)
     $srcHeight = [Math]::Max(1, $y2 - $y1)
+}
+
+if ($WindowTitle -and ($srcWidth -lt 32 -or $srcHeight -lt 32)) {
+    Write-Error "窗口可见区域太小（${srcWidth}x${srcHeight}），可能已最小化或移出屏幕"
+    exit 5
 }
 
 $bitmap = New-Object System.Drawing.Bitmap $srcWidth, $srcHeight

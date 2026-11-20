@@ -1,7 +1,7 @@
 /**
  * 独立自测：截图 → 入库 → 列出（不依赖 DSH）
  */
-import { captureOnce } from '../lib/capture.mjs'
+import { capture } from '../lib/capture.mjs'
 import { makeStore } from '../lib/store.mjs'
 import { readFileSync, mkdtempSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
@@ -12,7 +12,7 @@ const store = makeStore(tmp)
 
 console.log('  store backend:', store.sqliteOk ? 'sqlite' : 'json')
 
-const shot = await captureOnce()
+const shot = await capture()
 if (!shot.ok) {
   console.log('  ✗ 截图失败:', shot.err)
   process.exit(1)

@@ -1,10 +1,10 @@
 /**
  * scripts/schedule-test.mjs —— 定时归档的纯函数测试（不启动 DSH、不碰真实数据）
  */
-import { pathToFileURL } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { join } from 'node:path'
 
-const ROOT = 'E:/dsh-screen-memory/dsh-screen-memory'
+const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const { shouldRunMaintain, pickDueForArchive } = await import(pathToFileURL(join(ROOT, 'lib', 'maintain.mjs')).href)
 
 const out = []

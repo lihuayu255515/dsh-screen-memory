@@ -8,12 +8,12 @@
  *   · /ui 返回 HTML
  *   · 没 webServer 时 attachWebUI 安全跳过
  */
-import { pathToFileURL } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { mkdtempSync, writeFileSync, existsSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 
-const ROOT = 'E:/dsh-screen-memory/dsh-screen-memory'
+const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const { attachWebUI, API_BASE, UI_PATH } = await import(pathToFileURL(join(ROOT, 'lib', 'webui.mjs')).href)
 const { makeStore } = await import(pathToFileURL(join(ROOT, 'lib', 'store.mjs')).href)
 
@@ -105,6 +105,14 @@ const [reqF, resF] = fakeReqRes(API_BASE + '/full?id=1')
 await routes.get(API_BASE + '/full')(reqF, resF)
 check('full 返回原图', resF.code === 200 && resF.body.equals(png))
 
+const [reqT2, resT2] = fakeReqRes(API_BASE + '/thumb?id=2')
+await routes.get(API_BASE + '/thumb')(reqT2, resT2)
+check('thumb 拒绝非 screen 图', resT2.code === 404)
+
+const [reqF2, resF2] = fakeReqRes(API_BASE + '/full?id=2')
+await routes.get(API_BASE + '/full')(reqF2, resF2)
+check('full 拒绝非 screen 图', resF2.code === 404)
+
 const [reqU, resU] = fakeReqRes(UI_PATH)
 await routes.get(UI_PATH)(reqU, resU)
 const uiHtml = resU.body.toString('utf8')
@@ -134,6 +142,7 @@ const [reqD, resD] = fakeReqRes(API_BASE + '/trash?id=1', 'POST')
 await routes.get(API_BASE + '/trash')(reqD, resD)
 const trash = JSON.parse(resD.body.toString('utf8'))
 check('trash 只把屏幕截图移入回收站', trash.ok === true && store.get(1).state === 'trashed')
+check('trash 写入 judged_at 防止立即清理', Number(store.get(1).judged_at) > 0)
 
 const [reqD2, resD2] = fakeReqRes(API_BASE + '/trash?id=2', 'POST')
 await routes.get(API_BASE + '/trash')(reqD2, resD2)
@@ -187,6 +196,17 @@ const [reqArc, resArc] = fakeReqRes(API_BASE + '/archive?id=1', 'POST')
 await routes.get(API_BASE + '/archive')(reqArc, resArc)
 const archived = JSON.parse(resArc.body.toString('utf8'))
 check('archive 把活跃图归档', archived.ok === true && store.get(1).state === 'archived' && store.get(1).archive_file === 'stub.tar.gz')
+
+const [reqBK, resBK] = fakeReqRes(API_BASE + '/batch', 'POST')
+reqBK.body = JSON.stringify({ action: 'keep', ids: [1] })
+await routes.get(API_BASE + '/batch')(reqBK, resBK)
+const batchKeepArchived = JSON.parse(resBK.body.toString('utf8'))
+check('batch keep 先恢复归档再保留', batchKeepArchived.changed === 1 && store.get(1).state === 'hot' && store.get(1).judged === 1)
+
+const [reqArc2, resArc2] = fakeReqRes(API_BASE + '/archive?id=1', 'POST')
+await routes.get(API_BASE + '/archive')(reqArc2, resArc2)
+const archived2 = JSON.parse(resArc2.body.toString('utf8'))
+check('再次归档以便测试恢复', archived2.ok === true && store.get(1).state === 'archived')
 
 const [reqAR, resAR] = fakeReqRes(API_BASE + '/restore?id=1', 'POST')
 await routes.get(API_BASE + '/restore')(reqAR, resAR)

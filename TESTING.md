@@ -1,4 +1,4 @@
-# 测试说明（0.5.1）
+# 测试说明（0.5.2）
 
 > 这个版本：11 个工具（截图 / 窗口 / 特写 / 仓库 / 归档 / 回顾 / 检索 / 眼睛）+ 21 项自动验收。
 > 先跑「0. 自动验收」，再按「2. 手动清单」抽查即可。
@@ -43,7 +43,7 @@ node scripts/release-check.mjs   # 发布级检查（API 快照 + 双路径 veri
 | 6 | `screen_get({id})` | 返回本地路径 |
 | 7 | 用 `screen_archive` 存一张 png/jpg | 成功；存一个 txt 会**被拒绝**（只接受图片） |
 | 8 | `screen_review` | 列出待判断的图 |
-| 9 | `screen_judge({id, keep:true})` / `keep:false` | 保留 / 进回收站（7 天后删） |
+| 9 | `screen_judge({id, keep:true})` / `keep:false` | 保留 / 进回收站（7 天后可由手动整理清理；定时任务默认不清理） |
 | 10 | `screen_maintain({dryRun:true})` | 只报告不执行 |
 | 11 | `screen_maintain({archiveAfterDays:0})` | 归档成功，`screen_get` 能恢复 |
 | 12 | `screen_search({query:"..."})` | 命中对应图 |
@@ -60,6 +60,9 @@ node scripts/release-check.mjs   # 发布级检查（API 快照 + 双路径 veri
 | 14j | 点头部「特写」→ 填窗口标题和 x/y/w/h → 保存 / 删除 | 档案出现在列表；删除只删配置，不删图片 |
 | 14k | 点头部「清理」→ 先「预演」→ 勾选后「执行清理」 | 预演不改数据；执行前二次确认；不勾选时不清回收站 |
 | 14l | 刷新两次仓库 UI，观察缩略图 | 第一次生成 `thumbs/<id>.jpg`，第二次直接命中缓存；筛选/翻页走索引 |
+| 14m | UI 移到回收站后立刻跑 `screen_maintain({trashAfterDays:7})` | 不应清理；记录有 `judged_at`，7 天后才进入清理范围 |
+| 14n | 同一秒连续归档两张图；删掉一张原图后整理 | 两个 tar.gz 文件名不同；缺原图的记录保持 hot，不标记 archived |
+| 14o | 最小化窗口截图；导入 VP8/VP8L WebP | 最小化窗口返回失败；两种 WebP 都能识别宽高并入库 |
 
 ## 3. 预算档位（可选）
 
