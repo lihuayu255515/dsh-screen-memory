@@ -87,6 +87,7 @@ const uiHtml = resU.body.toString('utf8')
 check('UI 页面', resU.code === 200 && uiHtml.includes('屏幕记忆'))
 check('UI 含搜索/筛选/分页控件', uiHtml.includes('id="q"') && uiHtml.includes('id="state"') && uiHtml.includes('id="more"'))
 check('UI 含回收站按钮和确认提示', uiHtml.includes('id="trash"') && uiHtml.includes('window.confirm('))
+check('UI 含备注编辑和恢复按钮', uiHtml.includes('id="noteInput"') && uiHtml.includes('id="saveNote"') && uiHtml.includes('id="restore"'))
 try {
   const script = uiHtml.match(/<script>([\s\S]*)<\/script>/)
   if (!script) throw new Error('没有找到内联脚本')
@@ -115,6 +116,28 @@ const [reqD3, resD3] = fakeReqRes(API_BASE + '/list?limit=10&state=trashed')
 await routes.get(API_BASE + '/list')(reqD3, resD3)
 const listTrash = JSON.parse(resD3.body.toString('utf8'))
 check('回收站筛选可见', listTrash.ok && listTrash.total === 1 && listTrash.items[0].id === 1)
+
+const [reqN, resN] = fakeReqRes(API_BASE + '/note?id=1', 'POST')
+reqN.body = JSON.stringify({ note: '  新的备注  ' })
+await routes.get(API_BASE + '/note')(reqN, resN)
+const note = JSON.parse(resN.body.toString('utf8'))
+check('备注可保存并 trim', note.ok === true && note.note === '新的备注' && store.get(1).note === '新的备注')
+
+const [reqN2, resN2] = fakeReqRes(API_BASE + '/note?id=2', 'POST')
+reqN2.body = JSON.stringify({ note: '不该写进去' })
+await routes.get(API_BASE + '/note')(reqN2, resN2)
+const note2 = JSON.parse(resN2.body.toString('utf8'))
+check('备注拒绝非屏幕图片', note2.ok === false && store.get(2).note === 'qq pic')
+
+const [reqR, resR] = fakeReqRes(API_BASE + '/restore?id=1', 'POST')
+await routes.get(API_BASE + '/restore')(reqR, resR)
+const restored = JSON.parse(resR.body.toString('utf8'))
+check('回收站可恢复为活跃', restored.ok === true && store.get(1).state === 'hot')
+
+const [reqR2, resR2] = fakeReqRes(API_BASE + '/restore?id=2', 'POST')
+await routes.get(API_BASE + '/restore')(reqR2, resR2)
+const restored2 = JSON.parse(resR2.body.toString('utf8'))
+check('恢复拒绝非屏幕图片', restored2.ok === false && store.get(2).state === 'hot')
 
 // 没有 webServer 时必须安全跳过
 check('无 webServer 安全跳过', attachWebUI({ effect: (f) => f() }, { store, dataDir: dir, log: () => {} }) === false)
