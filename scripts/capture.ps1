@@ -82,7 +82,7 @@ elseif ($WindowTitle) {
             if ($p.MainWindowHandle -eq [IntPtr]::Zero) { continue }
             if (-not $p.MainWindowTitle) { continue }
             if ($p.MainWindowTitle -eq $WindowTitle) { $exact = $p; break }
-            if (-not $target -and $p.MainWindowTitle -like "*$WindowTitle*") { $target = $p }
+            if (-not $target -and $p.MainWindowTitle.IndexOf($WindowTitle, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) { $target = $p }
         } catch { }
     }
     $win = if ($exact) { $exact } else { $target }
