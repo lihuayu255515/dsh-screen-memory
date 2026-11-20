@@ -1,6 +1,6 @@
 {
   "name": "dsh-screen-memory",
-  "version": "0.4.23",
+  "version": "0.4.24",
   "stage": "P1.5 + P2 + P3 + P4",
   "platforms": {
     "win32": {
