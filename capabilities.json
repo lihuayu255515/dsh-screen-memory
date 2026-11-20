@@ -1,6 +1,6 @@
 {
   "name": "dsh-screen-memory",
-  "version": "0.4.25",
+  "version": "0.4.26",
   "stage": "P1.5 + P2 + P3 + P4",
   "platforms": {
     "win32": {
@@ -219,17 +219,24 @@
       "note": "screen_look 只产生图片文件；要分析必须走 read_image 或 screen_describe"
     },
     "warehouseUI": {
-      "stage": "M1",
+      "stage": "M1.5",
       "path": "/dsh-screen-memory/ui",
       "panel": "sidebar.right.pane.tab（退化：settings.section）",
-      "readOnly": true,
+      "readOnly": false,
+      "writeActions": [
+        "移至回收站（POST /trash，仅 screen 截图，前端 confirm 二次确认）"
+      ],
       "shows": "screen 截图（source LIKE screen%）",
       "actions": [
         "浏览缩略图",
         "查看原图",
-        "让 AI 看这张（调用视觉 API，计入日限）"
+        "搜索备注/来源/编号",
+        "按状态筛选",
+        "分页加载",
+        "让 AI 看这张（调用视觉 API，计入日限）",
+        "单张移至回收站（需确认，无永久删除）"
       ],
-      "disclosure": "页面内「这是什么？」说明 + 眼睛未配置时按钮置灰并提示"
+      "disclosure": "页面内「这是什么？」说明 + 眼睛未配置时按钮置灰并提示 + 回收站操作二次确认"
     },
     "maintainSchedule": {
       "enabled": true,

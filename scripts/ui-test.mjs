@@ -28,7 +28,8 @@ const dir = mkdtempSync(join(tmpdir(), 'dsm-ui-'))
 const store = makeStore(dir)
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64')
 store.put(png, { width: 1, height: 1, source: 'screen', note: 'screen shot', mime: 'image/png' })
-store.put(png, { width: 1, height: 1, source: 'qq', note: 'qq pic', mime: 'image/png' })
+const png2 = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=', 'base64')
+store.put(png2, { width: 1, height: 1, source: 'qq', note: 'qq pic', mime: 'image/png' })
 
 // 假 ctx
 const routes = new Map()
@@ -85,6 +86,7 @@ await routes.get(UI_PATH)(reqU, resU)
 const uiHtml = resU.body.toString('utf8')
 check('UI 页面', resU.code === 200 && uiHtml.includes('屏幕记忆'))
 check('UI 含搜索/筛选/分页控件', uiHtml.includes('id="q"') && uiHtml.includes('id="state"') && uiHtml.includes('id="more"'))
+check('UI 含回收站按钮和确认提示', uiHtml.includes('id="trash"') && uiHtml.includes('window.confirm('))
 try {
   const script = uiHtml.match(/<script>([\s\S]*)<\/script>/)
   if (!script) throw new Error('没有找到内联脚本')
@@ -98,6 +100,21 @@ const [reqA, resA] = fakeReqRes(API_BASE + '/ask?id=1', 'POST')
 await routes.get(API_BASE + '/ask')(reqA, resA)
 const ask = JSON.parse(resA.body.toString('utf8'))
 check('ask 未配置 Key 时被拒绝', ask.ok === false && /没有配置视觉 API/.test(ask.error || ''))
+
+const [reqD, resD] = fakeReqRes(API_BASE + '/trash?id=1', 'POST')
+await routes.get(API_BASE + '/trash')(reqD, resD)
+const trash = JSON.parse(resD.body.toString('utf8'))
+check('trash 只把屏幕截图移入回收站', trash.ok === true && store.get(1).state === 'trashed')
+
+const [reqD2, resD2] = fakeReqRes(API_BASE + '/trash?id=2', 'POST')
+await routes.get(API_BASE + '/trash')(reqD2, resD2)
+const trash2 = JSON.parse(resD2.body.toString('utf8'))
+check('trash 拒绝非屏幕图片', trash2.ok === false && store.get(2).state === 'hot')
+
+const [reqD3, resD3] = fakeReqRes(API_BASE + '/list?limit=10&state=trashed')
+await routes.get(API_BASE + '/list')(reqD3, resD3)
+const listTrash = JSON.parse(resD3.body.toString('utf8'))
+check('回收站筛选可见', listTrash.ok && listTrash.total === 1 && listTrash.items[0].id === 1)
 
 // 没有 webServer 时必须安全跳过
 check('无 webServer 安全跳过', attachWebUI({ effect: (f) => f() }, { store, dataDir: dir, log: () => {} }) === false)
