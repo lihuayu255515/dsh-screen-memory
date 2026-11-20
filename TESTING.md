@@ -1,4 +1,4 @@
-# 测试说明（0.5.4）
+# 测试说明（0.5.5）
 
 > 这个版本：11 个工具（截图 / 窗口 / 特写 / 仓库 / 归档 / 回顾 / 检索 / 眼睛）+ 22 项自动验收。
 > 先跑「0. 自动验收」，再按「2. 手动清单」抽查即可。
@@ -65,6 +65,7 @@ node scripts/release-check.mjs   # 发布级检查（API 快照 + 双路径 veri
 | 14o | 最小化窗口截图；导入 VP8/VP8L WebP | 最小化窗口返回失败；两种 WebP 都能识别宽高并入库 |
 | 14p | 人为让 `tar` 不可用，触发一次定时归档，再恢复 `tar` | 失败时不写 `maintain-last.json`；下一次 5 分钟检查会重试，不会默认等 3 天 |
 | 14q | 在未配置眼睛的机器上跑 doctor、`screen_status`，打开仓库 UI | doctor 标出「眼睛 API 未配置（可选）」和 tar 状态；status.setup.missing 含 vision 且带 hints；UI 显示三种配置方式并禁用「让 AI 看这张」 |
+| 14r | 只设置 `DSH_VISION_API_KEY`（不建 credentials.yaml），跑 `node scripts/info.mjs --json` | environment.visionKey 为 `DSH_VISION_API_KEY`，不再误报没配；missing 里没有视觉 Key |
 
 ## 3. 预算档位（可选）
 

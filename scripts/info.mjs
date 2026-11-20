@@ -41,7 +41,8 @@ const env = {
   ffmpeg: probe(process.env.FFMPEG_PATH || 'ffmpeg'),
   tar: probe('tar', ['--version']),
   visionKey: (() => {
-    if (process.env.DEEPSEEK_API_KEY) return 'env'
+    if (process.env.DSH_VISION_API_KEY) return 'DSH_VISION_API_KEY'
+    if (process.env.DEEPSEEK_API_KEY) return 'DEEPSEEK_API_KEY'
     try {
       const t = readFileSync(join(DSH_HOME, '.credentials.yaml'), 'utf8')
       return /DEEPSEEK_API_KEY:\s*\S+/.test(t) ? 'credentials.yaml' : ''
@@ -55,7 +56,7 @@ if (process.platform === 'win32' && !env.powershell) missing.push({ item: 'Power
 if (process.platform !== 'win32') missing.push({ item: 'Windows 截图后端', fix: '当前版本只支持 Windows 截图；仓库/眼睛对已有图片仍可用' })
 if (!env.ffmpeg) missing.push({ item: 'ffmpeg（只有特写需要）', fix: 'winget install Gyan.FFmpeg 后重启 DSH；不装也能整屏/按窗口截图' })
 if (!env.tar) missing.push({ item: 'tar（只有归档需要）', fix: 'Windows 10 1803+ 自带；Linux/macOS 默认有' })
-if (!env.visionKey) missing.push({ item: '视觉 API Key（只有眼睛需要）', fix: '插件配置填 vision.apiKey，或 ~/.dsh/.credentials.yaml 里加 DEEPSEEK_API_KEY' })
+if (!env.visionKey) missing.push({ item: '视觉 API Key（只有眼睛需要）', fix: '插件配置填 vision.apiKey，或设置 DSH_VISION_API_KEY / DEEPSEEK_API_KEY，或在 ~/.dsh/.credentials.yaml 里加 DEEPSEEK_API_KEY' })
 
 const tools = (cap.tools || []).map((t) => t.name)
 const summary = {
@@ -82,7 +83,7 @@ const summary = {
   tellUser: [
     '它会截屏，截的是整个桌面（录屏/共享内容也会被拍到）',
     '眼睛会把图片发给视觉 API（不配 Key 就不会外发）',
-    '归档会删除原图（tar.gz 留备份，可 screen_get 恢复）；回收站 7 天后物理删除',
+    '归档会删除原图（tar.gz 留备份，可 screen_get 恢复）；回收站超过 7 天后可由手动整理清理，定时任务默认不清理',
   ],
   data: cap.dataDir,
   docs: ['README.md（完整）', 'NEWBIE_QUICKSTART.md（零基础）', 'TESTING.md（测试清单）', 'capabilities.json（机器可读）'],

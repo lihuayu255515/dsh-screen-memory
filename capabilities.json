@@ -1,6 +1,6 @@
 {
   "name": "dsh-screen-memory",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "stage": "P1.5 + P2 + P3 + P4",
   "platforms": {
     "win32": {
@@ -219,7 +219,7 @@
       "note": "screen_look 只产生图片文件；要分析必须走 read_image 或 screen_describe"
     },
     "warehouseUI": {
-      "stage": "M2.3",
+      "stage": "M2.4",
       "path": "/dsh-screen-memory/ui",
       "panel": "sidebar.right.pane.tab（退化：settings.section）",
       "readOnly": false,
