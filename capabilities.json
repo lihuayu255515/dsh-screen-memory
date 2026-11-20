@@ -1,6 +1,6 @@
 {
   "name": "dsh-screen-memory",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "stage": "P1.5 + P2 + P3 + P4",
   "platforms": {
     "win32": {
@@ -219,7 +219,7 @@
       "note": "screen_look 只产生图片文件；要分析必须走 read_image 或 screen_describe"
     },
     "warehouseUI": {
-      "stage": "M2.2",
+      "stage": "M2.3",
       "path": "/dsh-screen-memory/ui",
       "panel": "sidebar.right.pane.tab（退化：settings.section）",
       "readOnly": false,
@@ -272,7 +272,13 @@
         "HUD place 统一为 corner/br/bl/tr/tl/rail/strip",
         "WebP 支持 VP8X/VP8/VP8L",
         "定时归档失败不写 lastAt，下一次 5 分钟检查重试"
-      ]
+      ],
+      "onboarding": {
+        "statusSetup": "screen_status.setup: ready/missing/hints",
+        "doctor": "检查截图后端、视觉 API、tar、仓库",
+        "uiVisionHints": "未配置眼睛时显示三种配置方式并禁用按钮",
+        "optionalDependencyHints": "ffmpeg / tar 缺失时给出安装路径提示"
+      }
     },
     "maintainSchedule": {
       "enabled": true,

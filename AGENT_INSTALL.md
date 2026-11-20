@@ -17,7 +17,9 @@
 1. 先检查环境（不要改任何东西）：
    - 运行 `node -v`，告诉我版本
    - 在包目录里运行 `node scripts/doctor.mjs`，把完整输出贴给我
+   - doctor 会分别列出截图后端、眼睛 API（可选）、归档 tar（可选）
    - 如果结论不是「可以安装」，停下来，不要装，把输出给我
+   - 眼睛未配置不影响安装：不要替用户填写或读取 API Key；只把三种配置方式告诉用户
 
 2. 备份（装之前）：
    - 把 `~/.dsh/profiles/web/package.json` 复制一份为 `package.json.bak-before-screen-memory`
@@ -27,7 +29,7 @@
    - 装完告诉我它修改了哪些文件
 
 4. 重启 DSH（必须），然后验证：
-   - 调 `screen_status`，贴 JSON 给我（重点看 capture.chosen 是不是 powershell）
+   - 调 `screen_status`，贴 JSON 给我（重点看 capture.chosen，以及 setup.missing / setup.hints）
    - 调 `screen_look`，贴返回文字给我
    - 调 `screen_list`，确认能看到刚才那张
    - 用 `read_image` 打开 screen_look 返回的路径，确认能看到屏幕内容

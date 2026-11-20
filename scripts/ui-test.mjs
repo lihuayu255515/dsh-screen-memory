@@ -124,6 +124,7 @@ check('UI 含待判断筛选与保留/不要按钮', uiHtml.includes('value="rev
 check('UI 含归档按钮与归档占位', uiHtml.includes('id="archive"') && uiHtml.includes('id="archivedNote"'))
 check('UI 含批量选择与动作条', uiHtml.includes('id="batchbar"') && uiHtml.includes('id="selectAll"') && uiHtml.includes('data-batch="keep"'))
 check('UI 含导入/特写/清理入口', uiHtml.includes('id="importBtn"') && uiHtml.includes('id="hudBtn"') && uiHtml.includes('id="cleanupBtn"') && uiHtml.includes('id="hudOv"') && uiHtml.includes('id="cleanupOv"'))
+check('UI 含视觉 API 配置引导', uiHtml.includes('DEEPSEEK_API_KEY') && uiHtml.includes('DSH_VISION_API_KEY') && uiHtml.includes('vision.apiKey'))
 try {
   const script = uiHtml.match(/<script>([\s\S]*)<\/script>/)
   if (!script) throw new Error('没有找到内联脚本')
