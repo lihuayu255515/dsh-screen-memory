@@ -10,6 +10,20 @@
 安全     不开端口 · 不建计划任务 · 不注册全局 hook · 初始化失败不影响 DSH 启动
 ```
 
+## 界面一览
+
+> 演示环境，示例数据；真实图片只存在本机。
+
+| 仓库总览 | 单张详情 | 批量操作 |
+|---|---|---|
+| ![仓库总览](docs/screenshots/01-gallery.png) | ![单张详情](docs/screenshots/02-detail.png) | ![批量操作](docs/screenshots/03-batch.png) |
+
+| 存储清理 | 窗口特写档案 | 内置引导 |
+|---|---|---|
+| ![存储清理](docs/screenshots/04-cleanup.png) | ![窗口特写档案](docs/screenshots/05-hud.png) | ![内置引导](docs/screenshots/06-help.png) |
+
+完整配图文案见 [MARKETING.md](MARKETING.md)。
+
 ---
 
 # 给 AI agent 的必读（人类可跳过到「一、按你的情况选方案」）

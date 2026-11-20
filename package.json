@@ -21,10 +21,14 @@
     "capabilities.json",
     "TEST_PROMPT.md",
     "api-snapshot.json",
-    "NEWBIE_QUICKSTART.md"
+    "NEWBIE_QUICKSTART.md",
+    "MARKETING.md",
+    "PUBLISHING.md",
+    "docs/",
+    "LICENSE"
   ],
   "engines": {
-    "node": ">=22"
+    "node": ">=18"
   },
   "keywords": [
     "dsh",
