@@ -31,6 +31,13 @@ store.put(png, { width: 1, height: 1, source: 'screen', note: 'screen shot', mim
 const png2 = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=', 'base64')
 store.put(png2, { width: 1, height: 1, source: 'qq', note: 'qq pic', mime: 'image/png' })
 
+const hudMap = new Map()
+const hud = {
+  list: () => [...hudMap.entries()].map(([window, p]) => ({ window, ...p })),
+  set: (window, p) => { hudMap.set(window, p); return { window, ...p } },
+  remove: (window) => hudMap.delete(window),
+}
+
 // 假 ctx
 const routes = new Map()
 const fakeCtx = {
@@ -56,6 +63,9 @@ const attached = attachWebUI(fakeCtx, {
     store.update(id, { state: 'hot', archive_file: null, judged: 0, judged_at: 0 })
     return { ok: true, id, path: 'stub' }
   },
+  hud,
+  importImage: async ({ note }) => ({ ok: true, id: 99, note }),
+  maintain: async ({ dryRun }) => ({ ok: true, text: dryRun ? '预演：0 张' : '已执行：0 张' }),
 })
 check('attachWebUI 注册成功', attached === true, routes.size + ' 条路由')
 
@@ -103,6 +113,7 @@ check('UI 含备注编辑和恢复按钮', uiHtml.includes('id="noteInput"') && 
 check('UI 含待判断筛选与保留/不要按钮', uiHtml.includes('value="review"') && uiHtml.includes('id="keep"') && uiHtml.includes('id="discard"'))
 check('UI 含归档按钮与归档占位', uiHtml.includes('id="archive"') && uiHtml.includes('id="archivedNote"'))
 check('UI 含批量选择与动作条', uiHtml.includes('id="batchbar"') && uiHtml.includes('id="selectAll"') && uiHtml.includes('data-batch="keep"'))
+check('UI 含导入/特写/清理入口', uiHtml.includes('id="importBtn"') && uiHtml.includes('id="hudBtn"') && uiHtml.includes('id="cleanupBtn"') && uiHtml.includes('id="hudOv"') && uiHtml.includes('id="cleanupOv"'))
 try {
   const script = uiHtml.match(/<script>([\s\S]*)<\/script>/)
   if (!script) throw new Error('没有找到内联脚本')
@@ -197,6 +208,34 @@ reqB2.body = JSON.stringify({ action: 'keep', ids: [1, 2] })
 await routes.get(API_BASE + '/batch')(reqB2, resB2)
 const batchKeep = JSON.parse(resB2.body.toString('utf8'))
 check('batch keep 只处理 screen 图', batchKeep.changed === 1 && store.get(1).judged === 1 && store.get(2).judged === 0)
+
+const [reqH, resH] = fakeReqRes(API_BASE + '/hud', 'GET')
+await routes.get(API_BASE + '/hud')(reqH, resH)
+const hudList = JSON.parse(resH.body.toString('utf8'))
+check('HUD 列表接口', hudList.ok && hudList.items.length === 0)
+
+const [reqH2, resH2] = fakeReqRes(API_BASE + '/hud', 'POST')
+reqH2.body = JSON.stringify({ window: 'Demo', region: { x: 10, y: 20, w: 300, h: 180 }, place: 'corner' })
+await routes.get(API_BASE + '/hud')(reqH2, resH2)
+const hudSet = JSON.parse(resH2.body.toString('utf8'))
+check('HUD 保存接口', hudSet.ok && hudMap.get('Demo').region.w === 300)
+
+const [reqH3, resH3] = fakeReqRes(API_BASE + '/hud', 'POST')
+reqH3.body = JSON.stringify({ window: 'Demo', clear: true })
+await routes.get(API_BASE + '/hud')(reqH3, resH3)
+check('HUD 删除接口', !hudMap.has('Demo'))
+
+const [reqI, resI] = fakeReqRes(API_BASE + '/import', 'POST')
+reqI.body = JSON.stringify({ dataUrl: 'data:image/png;base64,' + png.toString('base64'), note: 'upload.png' })
+await routes.get(API_BASE + '/import')(reqI, resI)
+const imported = JSON.parse(resI.body.toString('utf8'))
+check('导入图片接口', imported.ok && imported.id === 99)
+
+const [reqC, resC] = fakeReqRes(API_BASE + '/cleanup', 'POST')
+reqC.body = JSON.stringify({ dryRun: true })
+await routes.get(API_BASE + '/cleanup')(reqC, resC)
+const cleaned = JSON.parse(resC.body.toString('utf8'))
+check('存储清理预演接口', cleaned.ok && /预演/.test(cleaned.text || ''))
 
 // 没有 webServer 时必须安全跳过
 check('无 webServer 安全跳过', attachWebUI({ effect: (f) => f() }, { store, dataDir: dir, log: () => {} }) === false)
