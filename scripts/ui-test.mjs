@@ -88,6 +88,7 @@ check('UI 页面', resU.code === 200 && uiHtml.includes('屏幕记忆'))
 check('UI 含搜索/筛选/分页控件', uiHtml.includes('id="q"') && uiHtml.includes('id="state"') && uiHtml.includes('id="more"'))
 check('UI 含回收站按钮和确认提示', uiHtml.includes('id="trash"') && uiHtml.includes('window.confirm('))
 check('UI 含备注编辑和恢复按钮', uiHtml.includes('id="noteInput"') && uiHtml.includes('id="saveNote"') && uiHtml.includes('id="restore"'))
+check('UI 含待判断筛选与保留/不要按钮', uiHtml.includes('value="review"') && uiHtml.includes('id="keep"') && uiHtml.includes('id="discard"'))
 try {
   const script = uiHtml.match(/<script>([\s\S]*)<\/script>/)
   if (!script) throw new Error('没有找到内联脚本')
@@ -138,6 +139,28 @@ const [reqR2, resR2] = fakeReqRes(API_BASE + '/restore?id=2', 'POST')
 await routes.get(API_BASE + '/restore')(reqR2, resR2)
 const restored2 = JSON.parse(resR2.body.toString('utf8'))
 check('恢复拒绝非屏幕图片', restored2.ok === false && store.get(2).state === 'hot')
+
+const [reqRev, resRev] = fakeReqRes(API_BASE + '/list?limit=10&state=review')
+await routes.get(API_BASE + '/list')(reqRev, resRev)
+const review = JSON.parse(resRev.body.toString('utf8'))
+check('待判断筛选只列未判断 hot', review.ok && review.total === 1 && review.items[0].id === 1)
+
+const [reqJ, resJ] = fakeReqRes(API_BASE + '/judge?id=1', 'POST')
+reqJ.body = JSON.stringify({ keep: true })
+await routes.get(API_BASE + '/judge')(reqJ, resJ)
+const judged = JSON.parse(resJ.body.toString('utf8'))
+check('judge 保留并标记已判断', judged.ok === true && store.get(1).state === 'hot' && store.get(1).judged === 1)
+
+const [reqRev2, resRev2] = fakeReqRes(API_BASE + '/list?limit=10&state=review')
+await routes.get(API_BASE + '/list')(reqRev2, resRev2)
+const review2 = JSON.parse(resRev2.body.toString('utf8'))
+check('判断后离开待判断列表', review2.ok && review2.total === 0)
+
+const [reqJ2, resJ2] = fakeReqRes(API_BASE + '/judge?id=1', 'POST')
+reqJ2.body = JSON.stringify({ keep: false })
+await routes.get(API_BASE + '/judge')(reqJ2, resJ2)
+const judged2 = JSON.parse(resJ2.body.toString('utf8'))
+check('judge 不要时移入回收站', judged2.ok === true && store.get(1).state === 'trashed' && store.get(1).judged === 1)
 
 // 没有 webServer 时必须安全跳过
 check('无 webServer 安全跳过', attachWebUI({ effect: (f) => f() }, { store, dataDir: dir, log: () => {} }) === false)
