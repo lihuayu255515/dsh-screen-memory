@@ -55,6 +55,17 @@ const [reqL, resL] = fakeReqRes(API_BASE + '/list?limit=10')
 await routes.get(API_BASE + '/list')(reqL, resL)
 const list = JSON.parse(resL.body.toString('utf8'))
 check('list 200 且只含屏幕截图', resL.code === 200 && list.ok && list.items.length === 1 && list.items[0].note === 'screen shot', JSON.stringify(list.items.map((x) => x.note)))
+check('list 带 source 字段', list.items.length === 1 && list.items[0].source === 'screen')
+
+const [reqQ, resQ] = fakeReqRes(API_BASE + '/list?limit=10&q=screen')
+await routes.get(API_BASE + '/list')(reqQ, resQ)
+const listQ = JSON.parse(resQ.body.toString('utf8'))
+check('list 可按来源搜索', listQ.ok && listQ.total === 1 && listQ.items.length === 1)
+
+const [reqZ, resZ] = fakeReqRes(API_BASE + '/list?limit=10&state=trashed')
+await routes.get(API_BASE + '/list')(reqZ, resZ)
+const listZ = JSON.parse(resZ.body.toString('utf8'))
+check('list 可按状态筛选', listZ.ok && listZ.total === 0 && listZ.items.length === 0)
 
 const [reqS, resS] = fakeReqRes(API_BASE + '/stats')
 await routes.get(API_BASE + '/stats')(reqS, resS)
@@ -71,7 +82,17 @@ check('full 返回原图', resF.code === 200 && resF.body.equals(png))
 
 const [reqU, resU] = fakeReqRes(UI_PATH)
 await routes.get(UI_PATH)(reqU, resU)
-check('UI 页面', resU.code === 200 && resU.body.toString('utf8').includes('屏幕记忆'))
+const uiHtml = resU.body.toString('utf8')
+check('UI 页面', resU.code === 200 && uiHtml.includes('屏幕记忆'))
+check('UI 含搜索/筛选/分页控件', uiHtml.includes('id="q"') && uiHtml.includes('id="state"') && uiHtml.includes('id="more"'))
+try {
+  const script = uiHtml.match(/<script>([\s\S]*)<\/script>/)
+  if (!script) throw new Error('没有找到内联脚本')
+  new Function(script[1])
+  check('UI 内联脚本语法', true)
+} catch (e) {
+  check('UI 内联脚本语法', false, String(e && e.message))
+}
 
 const [reqA, resA] = fakeReqRes(API_BASE + '/ask?id=1', 'POST')
 await routes.get(API_BASE + '/ask')(reqA, resA)
