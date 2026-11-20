@@ -1,6 +1,6 @@
 {
   "name": "dsh-screen-memory",
-  "version": "0.4.30",
+  "version": "0.4.31",
   "description": "DSH 屏幕记忆：截图（整屏/窗口/特写）+ 本地图片仓库（内容寻址 + SQLite）+ 分层归档 + 回顾判断 + 眼睛（视觉 API 看图转文字）+ 上下文预算三档。README 含 AI agent 安装与告知指南。",
   "type": "module",
   "main": "lib/index.js",
