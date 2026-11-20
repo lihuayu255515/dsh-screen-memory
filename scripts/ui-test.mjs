@@ -102,6 +102,7 @@ check('UI 含回收站按钮和确认提示', uiHtml.includes('id="trash"') && u
 check('UI 含备注编辑和恢复按钮', uiHtml.includes('id="noteInput"') && uiHtml.includes('id="saveNote"') && uiHtml.includes('id="restore"'))
 check('UI 含待判断筛选与保留/不要按钮', uiHtml.includes('value="review"') && uiHtml.includes('id="keep"') && uiHtml.includes('id="discard"'))
 check('UI 含归档按钮与归档占位', uiHtml.includes('id="archive"') && uiHtml.includes('id="archivedNote"'))
+check('UI 含批量选择与动作条', uiHtml.includes('id="batchbar"') && uiHtml.includes('id="selectAll"') && uiHtml.includes('data-batch="keep"'))
 try {
   const script = uiHtml.match(/<script>([\s\S]*)<\/script>/)
   if (!script) throw new Error('没有找到内联脚本')
@@ -184,6 +185,18 @@ reqJ2.body = JSON.stringify({ keep: false })
 await routes.get(API_BASE + '/judge')(reqJ2, resJ2)
 const judged2 = JSON.parse(resJ2.body.toString('utf8'))
 check('judge 不要时移入回收站', judged2.ok === true && store.get(1).state === 'trashed' && store.get(1).judged === 1)
+
+const [reqB, resB] = fakeReqRes(API_BASE + '/batch', 'POST')
+reqB.body = JSON.stringify({ action: 'restore', ids: [1] })
+await routes.get(API_BASE + '/batch')(reqB, resB)
+const batchRestore = JSON.parse(resB.body.toString('utf8'))
+check('batch restore 恢复回收站图', batchRestore.ok === true && batchRestore.changed === 1 && store.get(1).state === 'hot')
+
+const [reqB2, resB2] = fakeReqRes(API_BASE + '/batch', 'POST')
+reqB2.body = JSON.stringify({ action: 'keep', ids: [1, 2] })
+await routes.get(API_BASE + '/batch')(reqB2, resB2)
+const batchKeep = JSON.parse(resB2.body.toString('utf8'))
+check('batch keep 只处理 screen 图', batchKeep.changed === 1 && store.get(1).judged === 1 && store.get(2).judged === 0)
 
 // 没有 webServer 时必须安全跳过
 check('无 webServer 安全跳过', attachWebUI({ effect: (f) => f() }, { store, dataDir: dir, log: () => {} }) === false)

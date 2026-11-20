@@ -1,6 +1,6 @@
 {
   "name": "dsh-screen-memory",
-  "version": "0.4.29",
+  "version": "0.4.30",
   "stage": "P1.5 + P2 + P3 + P4",
   "platforms": {
     "win32": {
@@ -219,7 +219,7 @@
       "note": "screen_look 只产生图片文件；要分析必须走 read_image 或 screen_describe"
     },
     "warehouseUI": {
-      "stage": "M1.8",
+      "stage": "M1.9",
       "path": "/dsh-screen-memory/ui",
       "panel": "sidebar.right.pane.tab（退化：settings.section）",
       "readOnly": false,
@@ -228,7 +228,8 @@
         "编辑备注（POST /note，仅 screen 截图，最多 500 字）",
         "从归档/回收站恢复（POST /restore，仅 screen 截图，恢复为 hot 并清零 judged）",
         "判断保留/不要（POST /judge；不要需前端 confirm，移入回收站）",
-        "单张归档（POST /archive，仅 hot screen 截图，tar.gz）"
+        "单张归档（POST /archive，仅 hot screen 截图，tar.gz）",
+        "批量操作（POST /batch；keep/discard/archive/restore，最多 100 张，逐条返回）"
       ],
       "shows": "screen 截图（source LIKE screen%）",
       "actions": [
@@ -239,12 +240,13 @@
         "分页加载",
         "编辑单张备注（≤500 字）",
         "判断保留/不要",
+        "批量保留/不要/归档/恢复",
         "让 AI 看这张（调用视觉 API，计入日限）",
         "单张归档 / 从归档恢复",
         "单张移至回收站（需确认，无永久删除）",
         "从回收站恢复为活跃"
       ],
-      "disclosure": "页面内「这是什么？」说明 + 眼睛未配置时按钮置灰并提示 + 回收站/不要操作二次确认 + 备注/判断/归档/恢复接口只接受 screen 截图"
+      "disclosure": "页面内「这是什么？」说明 + 眼睛未配置时按钮置灰并提示 + 回收站/不要（含批量）操作二次确认 + 备注/判断/归档/恢复/批量接口只接受 screen 截图"
     },
     "maintainSchedule": {
       "enabled": true,
