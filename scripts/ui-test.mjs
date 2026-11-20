@@ -9,7 +9,7 @@
  *   · 没 webServer 时 attachWebUI 安全跳过
  */
 import { pathToFileURL } from 'node:url'
-import { mkdtempSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, writeFileSync, existsSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 
@@ -98,6 +98,8 @@ check('stats 结构', stats.ok && stats.store && typeof stats.vision.usedToday =
 const [reqT, resT] = fakeReqRes(API_BASE + '/thumb?id=1')
 await routes.get(API_BASE + '/thumb')(reqT, resT)
 check('thumb 返回图片', resT.code === 200 && resT.body.length > 100 && String(resT.headers['content-type']).startsWith('image/'), resT.body.length + ' bytes')
+const thumbCache = join(dir, 'thumbs', '1.jpg')
+check('thumb 写入缓存', existsSync(thumbCache) && statSync(thumbCache).size > 0)
 
 const [reqF, resF] = fakeReqRes(API_BASE + '/full?id=1')
 await routes.get(API_BASE + '/full')(reqF, resF)

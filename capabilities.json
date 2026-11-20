@@ -1,6 +1,6 @@
 {
   "name": "dsh-screen-memory",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "stage": "P1.5 + P2 + P3 + P4",
   "platforms": {
     "win32": {
@@ -252,7 +252,16 @@
         "单张移至回收站（需确认，无永久删除）",
         "从回收站恢复为活跃"
       ],
-      "disclosure": "页面内「这是什么？」说明 + 眼睛未配置时按钮置灰并提示 + 回收站/不要（含批量）操作二次确认 + 清理执行前确认 + 备注/判断/归档/恢复/批量接口只接受 screen 截图"
+      "disclosure": "页面内「这是什么？」说明 + 眼睛未配置时按钮置灰并提示 + 回收站/不要（含批量）操作二次确认 + 清理执行前确认 + 备注/判断/归档/恢复/批量接口只接受 screen 截图",
+      "performance": {
+        "thumbnailCache": "thumbs/<id>.jpg（首次生成后直接命中）",
+        "concurrentTemp": "缩略图使用随机临时文件，避免并发请求互相覆盖",
+        "sqliteIndexes": [
+          "idx_images_state_judged",
+          "idx_images_created_at",
+          "idx_images_source"
+        ]
+      }
     },
     "maintainSchedule": {
       "enabled": true,
