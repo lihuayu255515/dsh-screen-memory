@@ -1,6 +1,6 @@
 {
   "name": "dsh-screen-memory",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "stage": "P1.5 + P2 + P3 + P4",
   "platforms": {
     "win32": {
@@ -219,7 +219,7 @@
       "note": "screen_look 只产生图片文件；要分析必须走 read_image 或 screen_describe"
     },
     "warehouseUI": {
-      "stage": "M2.0",
+      "stage": "M2.1",
       "path": "/dsh-screen-memory/ui",
       "panel": "sidebar.right.pane.tab（退化：settings.section）",
       "readOnly": false,
@@ -261,7 +261,17 @@
           "idx_images_created_at",
           "idx_images_source"
         ]
-      }
+      },
+      "dataSafety": [
+        "UI 移入回收站写入 judged_at；judged_at=0 不参与自动清理",
+        "归档文件名带随机后缀，避免同秒覆盖",
+        "归档只标记实际有原图且进入压缩包的记录",
+        "批量保留已归档图先恢复 blob，再标记 judged",
+        "回顾/整理查询全量候选，不只看最新一批",
+        "最小化窗口判失败，不返回 1x1 假成功",
+        "HUD place 统一为 corner/br/bl/tr/tl/rail/strip",
+        "WebP 支持 VP8X/VP8/VP8L"
+      ]
     },
     "maintainSchedule": {
       "enabled": true,

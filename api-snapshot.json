@@ -1,5 +1,5 @@
 {
-  "version": "0.5.1",
+  "version": "0.5.2",
   "tools": {
     "screen_status": {
       "parameters": {
@@ -17,7 +17,7 @@
         "properties": {
           "window": {
             "type": "string",
-            "description": "窗口标题（完整标题；需要 ffmpeg）。省略=整屏"
+            "description": "窗口标题（完整标题；Windows 走 PowerShell，不需要 ffmpeg）。省略=整屏"
           },
           "region": {
             "type": "object",

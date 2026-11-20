@@ -129,20 +129,30 @@ try {
 
   // ---------- 5. 按窗口截图 ----------
   if (process.platform === 'win32' && (hasFfmpeg || backend === 'powershell')) {
-    let title = ''
+    let titles = []
     try {
       const prefer = ['Edge', 'Chrome', 'Terminal', 'cmd', 'Notepad', 'Code', 'Word']
       const all = execSync(
         'powershell -NoProfile -Command "Get-Process | Where-Object { $_.MainWindowTitle -and $_.MainWindowTitle.Length -gt 3 } | Select-Object -ExpandProperty MainWindowTitle"',
         { encoding: 'utf8', timeout: 15000 }).split(/\r?\n/).map((x) => x.trim()).filter(Boolean)
-      title = all.find((t) => prefer.some((k) => t.includes(k))) || all[0] || ''
+      titles = [...all.filter((t) => prefer.some((k) => t.includes(k))), ...all.filter((t) => !prefer.some((k) => t.includes(k)))]
     } catch {}
-    if (title) {
-      const r = await byName.screen_look.execute({ window: title, note: 'verify-window' }, {})
-      if (r.ok) pass('按窗口截图', `#${r.id} ${r.width}x${r.height}`)
-      else fail('按窗口截图', r.error)
-    } else {
+    if (!titles.length) {
       skip('按窗口截图', '找不到带标题的窗口', '先打开一个普通窗口（不要最小化）再跑一次')
+    } else {
+      let lastError = ''
+      let passed = false
+      // 可能第一个候选是最小化窗口；逐个试到可见窗口
+      for (const title of titles.slice(0, 8)) {
+        const r = await byName.screen_look.execute({ window: title, note: 'verify-window' }, {})
+        if (r.ok && r.width >= 32 && r.height >= 32) {
+          pass('按窗口截图', `#${r.id} ${r.width}x${r.height}`)
+          passed = true
+          break
+        }
+        lastError = r.ok ? `返回 ${r.width}x${r.height}，疑似窗口最小化/移出屏幕` : r.error
+      }
+      if (!passed) skip('按窗口截图', '没有可用的可见窗口', lastError || '候选窗口都不可截取')
     }
   } else {
     skip('按窗口截图', '需要 Windows 截图后端（PowerShell 或 ffmpeg）', '在 Windows 上这通常不会发生；检查 PowerShell 是否可用')
