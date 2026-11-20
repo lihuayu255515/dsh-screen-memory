@@ -81,6 +81,11 @@ try {
   const st = await byName.screen_status.execute({}, {})
   if (st.ok && st.version) pass('screen_status', 'version=' + st.version + ' capture=' + (st.capture && st.capture.chosen))
   else fail('screen_status', JSON.stringify(st).slice(0, 120))
+  if (st.setup && typeof st.setup.ready === 'boolean' && Array.isArray(st.setup.missing) && st.setup.hints && st.setup.hints.vision) {
+    pass('setup 引导', 'missing=' + (st.setup.missing.join(',') || '无'))
+  } else {
+    fail('setup 引导', 'screen_status.setup 缺少 ready/missing/hints', '检查 buildSetup()')
+  }
   try {
     const expect = globalThis.__expectedVersion
     if (!expect) skip('版本一致', '拿不到 package.json 版本')

@@ -3,7 +3,7 @@
 给 DeepSeek Harness（DSH）加一双"记得住"的眼睛：**截屏 → 存进本地图片仓库 → 按编号/关键词找回来**；还能按窗口截、把区域放大成特写、分层归档、回顾判断，以及让视觉模型"看图说文字"（不把图塞进你的上下文）。
 
 ```
-版本     0.5.3（实验性，0.x 阶段；接口可能微调，但数据结构向后兼容）
+版本     0.5.4（实验性，0.x 阶段；接口可能微调，但数据结构向后兼容）
 平台     截图仅 Windows；仓库/眼睛在 macOS/Linux 也可用（对已有图片）
 依赖     Node ≥18（推荐 ≥22）· ffmpeg（可选）· 视觉 API Key（可选）· 系统 tar（可选）
 数据     ~/.dsh/storages/screen-memory/（卸载不删）
@@ -134,7 +134,7 @@ trashed   判断"不要"的图 → 保留 7 天，之后物理删除
 
 推荐节奏：隔天 `screen_review` → `screen_judge` → 一周一次 `screen_maintain`（先 `dryRun:true` 看预演）。
 
-## 4.1 仓库 UI（0.5.3）
+## 4.1 仓库 UI（0.5.4）
 
 右侧栏「屏幕记忆」或浏览器打开：
 
@@ -231,6 +231,41 @@ DSH_VISION_MODEL=deepseek-flash
 
 # 3) 默认读 ~/.dsh/.credentials.yaml 里的 DEEPSEEK_API_KEY
 ```
+
+---
+
+## 5.1 首次使用：缺什么、怎么配
+
+安装后先跑：
+
+```bash
+node scripts/doctor.mjs
+```
+
+doctor 现在会分别报告：
+
+```
+截图后端 / ffmpeg
+眼睛 API（可选）
+归档 tar（只影响归档）
+仓库自检
+```
+
+`screen_status` 也会返回 `setup`：
+
+```jsonc
+{
+  "ready": true,
+  "missing": ["vision"],       // 缺的可选/核心能力
+  "hints": {
+    "vision": "复用 ~/.dsh/.credentials.yaml 的 DEEPSEEK_API_KEY ...",
+    "ffmpeg": "winget install Gyan.FFmpeg ...",
+    "tar": "Windows 10+ 自带；缺失时安装 bsdtar/libarchive ..."
+  }
+}
+```
+
+仓库 UI 里未配置眼睛时，会直接显示三种配置方式；不配眼睛也能截图、浏览、归档。
 
 ---
 
@@ -506,7 +541,8 @@ npm run release        # = node scripts/release-check.mjs
 | 0.5.0 | 仓库 UI 完成：导入本地图、窗口特写管理、存储清理（预演/确认/执行） |
 | 0.5.1 | 性能：缩略图落盘缓存、并发临时文件隔离、SQLite 索引 |
 | 0.5.2 | 数据安全修复：回收站时间戳、归档重名/缺图、批量保留归档、全量回顾、窗口最小化、HUD place、WebP、测试脚本 |
-| **0.5.3（当前）** | 定时归档失败保留重试；清理注释中的“只读 UI”残留 |
+| 0.5.3 | 定时归档失败保留重试；清理注释中的“只读 UI”残留 |
+| **0.5.4（当前）** | 首次使用引导：status.setup、doctor 检查眼睛/tar、UI 配置提示与依赖安装提示 |
 | 0.6.0 | 跨平台截图、超大规模仓库优化 |
 
 ---
