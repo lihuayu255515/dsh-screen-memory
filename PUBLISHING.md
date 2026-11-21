@@ -28,7 +28,7 @@ dsh-screen-memory 0.5.5
 在 GitHub 新建仓库，例如：
 
 ```
-https://github.com/<你的账号>/dsh-screen-memory
+https://github.com/lihuayu255515/dsh-screen-memory
 ```
 
 把地址填进 `package.json`（不要保留占位符）：
@@ -36,18 +36,18 @@ https://github.com/<你的账号>/dsh-screen-memory
 ```json
 "repository": {
   "type": "git",
-  "url": "git+https://github.com/<你的账号>/dsh-screen-memory.git"
+  "url": "git+https://github.com/lihuayu255515/dsh-screen-memory.git"
 },
-"homepage": "https://github.com/<你的账号>/dsh-screen-memory#readme",
+"homepage": "https://github.com/lihuayu255515/dsh-screen-memory#readme",
 "bugs": {
-  "url": "https://github.com/<你的账号>/dsh-screen-memory/issues"
+  "url": "https://github.com/lihuayu255515/dsh-screen-memory/issues"
 }
 ```
 
 然后：
 
 ```bash
-git remote add origin https://github.com/<你的账号>/dsh-screen-memory.git
+git remote add origin https://github.com/lihuayu255515/dsh-screen-memory.git
 git push -u origin main
 ```
 
@@ -85,7 +85,7 @@ npm publish --access public
 如果不可用，改用 scoped 包名，例如：
 
 ```
-@<你的账号>/dsh-screen-memory
+@lihuayu255515/dsh-screen-memory
 ```
 
 同时更新 `package.json` 的 `name`、`README` 和 Market 条目。Market 安装源优先使用 npm 包或作者提供的 GitHub Release tarball。

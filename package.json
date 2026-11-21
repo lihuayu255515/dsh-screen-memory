@@ -42,6 +42,14 @@
     "memory"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lihuayu255515/dsh-screen-memory.git"
+  },
+  "homepage": "https://github.com/lihuayu255515/dsh-screen-memory#readme",
+  "bugs": {
+    "url": "https://github.com/lihuayu255515/dsh-screen-memory/issues"
+  },
   "peerDependencies": {
     "@deepseek-ai/dsh-tools": "*"
   },
