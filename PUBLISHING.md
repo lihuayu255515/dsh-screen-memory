@@ -62,7 +62,8 @@ git push origin v0.5.5
 
 ```
 标题：v0.5.5 — 首次使用引导与安全修复
-附件：E:\dsh-screen-memory\dist\dsh-screen-memory-0.5.5.tgz
+附件：dsh-screen-memory-0.5.5.tgz
+（就是你在本机 npm pack 后 dist 里生成的文件；不要写死本机绝对路径）
 ```
 
 Release 正文可以直接用 `MARKETING.md` 的短版简介 + 配图。
